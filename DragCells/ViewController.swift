@@ -11,7 +11,7 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var tblView: UITableView!
     
-    let arrTitle = ["A","B","C","D","E","F","G","H","I","J"]
+    var arrTitle = ["A","B","C","D","E","F","G","H","I","J"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,8 +19,10 @@ class ViewController: UIViewController {
     }
     
     private func registerTableView() {
+        tblView.dragInteractionEnabled = true
         tblView.delegate = self
         tblView.dataSource = self
+        tblView.dragDelegate = self
         tblView.register(UINib(nibName: "DragCell", bundle: nil), forCellReuseIdentifier: "DragCell")
     }
     
@@ -43,3 +45,17 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
+extension ViewController: UITableViewDragDelegate {
+    
+    func tableView(_ tableView: UITableView, itemsForBeginning session: any UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        let dragItem = UIDragItem(itemProvider: NSItemProvider())
+        dragItem.localObject = arrTitle[indexPath.row]
+        return [ dragItem ]
+    }
+    
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        // Update the model
+        let mover = arrTitle.remove(at: sourceIndexPath.row)
+        arrTitle.insert(mover, at: destinationIndexPath.row)
+    }
+}
